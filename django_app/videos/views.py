@@ -4,13 +4,23 @@ from videos.models import *
 from .forms import *
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 #home videos
 def home(request):
     videos = Video.objects.annotate(
         total_comments=Count('comments'),
         total_likes=Count('likes')
     ).order_by('?') 
-    print(videos)
+    
+    paginator = Paginator(videos, 12)
+    page = request.GET.get('page')
+    
+    try:
+        videos = paginator.page(page)
+    except PageNotAnInteger:
+        videos = paginator.page(1)
+    except EmptyPage:
+        videos = paginator.page(paginator.num_pages)
     return render(request, 'home.html', {'videos': videos})
 #upload videos 
 @login_required
