@@ -1,6 +1,18 @@
 from django import forms
-from .models import Video
+from .models import *
 import re
+#formulario de comentarios
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Escribe tu comentario...'
+            })
+        }
+#formulario de carga de videos
 class VideoUploadForm(forms.ModelForm):
     class Meta:
         model = Video

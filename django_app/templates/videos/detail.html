@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="video-container">
+<div class="container">
     <h1>{{ video.title }}</h1>
     <div class="embed-responsive embed-responsive-16by9">
         <iframe 
@@ -10,5 +10,60 @@
         ></iframe>
     </div>
     <p>Subido por: {{ video.user.username }}</p>
+<!-- parte de like y dislike -->
+    <div class="rating-buttons">
+        <form action="{% url 'like_video' video.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn-like ">
+                👍 {{ video.total_likes }}
+            </button>
+        </form>
+        
+        <form action="{% url 'dislike_video' video.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn-dislike ">
+                👎 {{ video.total_dislikes }}
+            </button>
+        </form>
+    </div>
+    <!-- end parte de like y dislike -->
+
+    
+    <!-- part coments -->
+    <div class="Container mt-5">
+        <h3>Comentarios ({{ comments.count }})</h3>  
+        <br>
+        <div class=" mb-4">
+            {% if user.is_authenticated %}
+            <form method="post">
+                {% csrf_token %}
+                {{ form }}
+                <br>
+                <button type="submit" class="btn btn-primary">Publicar Comentario</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <a href="{% url 'login' %}">Inicia sesión</a> para comentar
+        </div>
+        {% endif %}    
+        <div class="comments-list">
+            {% for comment in comments %}
+            <div class="comment card mb-3">
+                <div class="card-body">
+                    <div class="comment-header mb-2">
+                        <strong>{{ comment.user.username }}</strong>
+                        <small class="text-muted">{{ comment.created_at|timesince }} atrás</small>
+                    </div>
+                    <p class="mb-0">{{ comment.content }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-muted">No hay comentarios . ¡Sé el primero en comentar! </p>
+            {% endfor %}
+        </div>
+    </div>
+     <!-- end part comments -->
+
 </div>
 {% endblock %}
