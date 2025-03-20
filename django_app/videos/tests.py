@@ -60,6 +60,7 @@ class PopularVideosTestsUnit(TestCase):
         
         response = self.client.get(reverse('popular_videos')) 
         
+        
 ########################################################
 ###Unit test videos history
 ######################################################## 
