@@ -86,6 +86,14 @@ def popular_videos(request):
 #detail of videos
 def video_detail(request, video_id):
     video = get_object_or_404(Video, id=video_id)
+    # Registrar visualización si el usuario está autenticado
+    if request.user.is_authenticated:
+        UserVideoHistory.objects.update_or_create(
+            user=request.user,
+            video=video,
+            defaults={'viewed_at': timezone.now()}
+        )
+    #traer comentarios
     comments = video.comments.all()    
     if request.method == 'POST' and request.user.is_authenticated:
         form = CommentForm(request.POST)
@@ -127,3 +135,20 @@ def dislike_video(request, video_id):
     else:
         video.dislikes.add(user)   
     return redirect('video_detail', video_id=video_id)
+
+#history of videos
+@login_required
+def view_history(request):
+    history_list = UserVideoHistory.objects.filter(
+        user=request.user
+    ).select_related('video').order_by('-viewed_at')
+    
+    paginator = Paginator(history_list, 10)
+    page = request.GET.get('page')
+    try:
+        history = paginator.page(page)
+    except PageNotAnInteger:
+        history = paginator.page(1)
+    except EmptyPage:
+        history = paginator.page(paginator.num_pages)   
+    return render(request, 'videos/history.html', {'history': history})

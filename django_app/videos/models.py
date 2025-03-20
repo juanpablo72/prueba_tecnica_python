@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 User = get_user_model()
-
 ##commetarios
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -30,3 +29,13 @@ class Video(models.Model):
         return self.dislikes.filter(id=user.id).exists()
     def user_has_liked(self, user):
         return self.likes.filter(id=user.id).exists() if user.is_authenticated else False
+#model for user video history
+class UserVideoHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    video = models.ForeignKey('Video', on_delete=models.CASCADE)
+    viewed_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        ordering = ['-viewed_at']
+        verbose_name_plural = 'Historial de usuarios'
+    def __str__(self):
+        return f"{self.user.username} vio {self.video.title} en {self.viewed_at}"

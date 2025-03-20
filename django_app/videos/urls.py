@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('history/', views.view_history, name='view_history'),#historial de videos
     path('popular/', views.popular_videos, name='popular_videos'),#videos populares
     path('upload/', views.upload_video, name='upload_video'),#cargar videos
     path('video/<int:video_id>/', views.video_detail, name='video_detail'),#detalle de videos

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Tu Historial de Visualización</h1>
+    
+    {% if history %}
+    <div class="list-group">
+        {% for entry in history %}
+        <a href="{% url 'video_detail' entry.video.id %}" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ entry.video.title }}</h5>
+                <small>{{ entry.viewed_at|timesince }} atrás</small>
+            </div>
+            <div class="embed-responsive embed-responsive-16by9 mt-2">
+                <iframe class="embed-responsive-item" 
+                        src="{{ entry.video.embed_link }}" 
+                        allowfullscreen></iframe>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if history.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ history.previous_page_number }}">&laquo;</a>
+            </li>
+            {% endif %}
+            
+            {% for num in history.paginator.page_range %}
+            <li class="page-item {% if history.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+            
+            {% if history.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ history.next_page_number }}">&raquo;</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% else %}
+    <div class="alert alert-info">
+        Aún no has visto ningún video.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
