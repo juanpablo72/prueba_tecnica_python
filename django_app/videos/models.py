@@ -15,7 +15,7 @@ class Comment(models.Model):
 class Video(models.Model):
     title = models.CharField(max_length=200)
     embed_link = models.URLField(max_length=500)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,null=False )
     created_at = models.DateTimeField(auto_now_add=True)
     likes = models.ManyToManyField(User, related_name='video_likes', blank=True)
     dislikes = models.ManyToManyField(User, related_name='video_dislikes', blank=True)
