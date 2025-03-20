@@ -3,4 +3,40 @@
 
 {% block content %}
 <h1>Bienvenido a YouTube Clone</h1>
+<!-- part aleatory videos -->
+<div class="container">
+    <h1 class="mb-4">Videos Aleatorios</h1>
+    
+    <div class="row">
+        {% for video in videos %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item" 
+                            src="{{ video.embed_link }}" 
+                            allowfullscreen></iframe>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ video.title }}</h5>
+                    <div class="video-stats">
+                        <span class="badge bg-success">
+                            👍 {{ video.total_likes }}
+                        </span>
+                        <span class="badge bg-danger">
+                            👎 {{ video.total_dislikes }}
+                        </span>
+                        <span class="badge bg-info">
+                            💬 {{ video.total_comments }}
+                        </span>
+                    </div>
+                    <a href="{% url 'video_detail' video.id %}" 
+                       class="btn btn-primary mt-2">
+                        Ver Video
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <!-- end part aleatory videos -->
 {% endblock %}

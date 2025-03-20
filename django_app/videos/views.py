@@ -3,10 +3,16 @@ from django.shortcuts import render, redirect
 from videos.models import *
 from .forms import *
 from django.shortcuts import get_object_or_404
-#inicio de videos
+from django.db.models import Count
+#home videos
 def home(request):
-    return render(request, 'home.html')
-#cargar videos
+    videos = Video.objects.annotate(
+        total_comments=Count('comments'),
+        total_likes=Count('likes')
+    ).order_by('?') 
+    print(videos)
+    return render(request, 'home.html', {'videos': videos})
+#upload videos 
 @login_required
 def upload_video(request):
     if request.method == 'POST':
@@ -19,7 +25,7 @@ def upload_video(request):
     else:
         form = VideoUploadForm() 
     return render(request, 'videos/upload.html', {'form': form})
-#dtealle de videos
+#detail of videos
 
 def video_detail(request, video_id):
     video = get_object_or_404(Video, id=video_id)
@@ -56,7 +62,7 @@ def like_video(request, video_id):
         video.likes.add(user)
     
     return redirect('video_detail', video_id=video_id)
-#no me gusta dislike
+#dislike
 @login_required
 def dislike_video(request, video_id):
     video = get_object_or_404(Video, id=video_id)
