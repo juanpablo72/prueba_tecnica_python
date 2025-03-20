@@ -79,22 +79,22 @@ WSGI_APPLICATION = 'clone_youtobe.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-""" DATABASES = {
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'NAME': 'youtube_clone',
+        'USER': 'admin',
+        'PASSWORD': '1234567890',
         'HOST': 'db',  # Nombre del servicio en docker-compose
         'PORT': '5432',
     }
-} """
-DATABASES = {
+} 
+""" DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-}
+} """
 
 
 # Password validation
