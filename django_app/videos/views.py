@@ -5,16 +5,16 @@ from .forms import *
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils import timezone
+from datetime import date
 #home videos
 def home(request):
     videos = Video.objects.annotate(
         total_comments=Count('comments'),
         total_likes=Count('likes')
-    ).order_by('?') 
-    
+    ).order_by('?')    
     paginator = Paginator(videos, 12)
-    page = request.GET.get('page')
-    
+    page = request.GET.get('page') 
     try:
         videos = paginator.page(page)
     except PageNotAnInteger:
@@ -35,12 +35,58 @@ def upload_video(request):
     else:
         form = VideoUploadForm() 
     return render(request, 'videos/upload.html', {'form': form})
-#detail of videos
 
+@login_required
+def popular_videos(request):
+    today = timezone.now().date()
+    current_month = today.month
+    current_year = today.year
+    current_month_videos = Video.objects.filter(
+        created_at__month=current_month,
+        created_at__year=current_year
+    ).prefetch_related('likes', 'dislikes', 'comments')
+    videos_with_popularity = []
+    for video in current_month_videos:
+        likes = video.likes.count()
+        dislikes = video.dislikes.count()
+        comments = video.comments.count()
+        days_old = (today - video.created_at.date()).days      
+        # Calcular popularidad
+        #values
+        ### likes = 10pts
+        ### dislikes = -5pts
+        ### comments = 1pt
+        base_score = (likes * 10) - (dislikes * 5) + comments
+        popularity = base_score * (1 - days_old)      
+        videos_with_popularity.append({
+            'video': video,
+            'popularity': popularity
+        })
+    # Ordenar videos
+    sorted_videos = sorted(videos_with_popularity, key=lambda x: -x['popularity'])   
+    # Seleccionar top 5
+    top_videos = [item['video'] for item in sorted_videos[:5]]
+    # Manejar empates
+    if len(top_videos) >= 5:
+        first_popularity = sorted_videos[0]['popularity']
+        if all(item['popularity'] == first_popularity for item in sorted_videos[:5]):
+            top_videos = list(current_month_videos.order_by('?')[:5])
+    
+    paginator = Paginator(top_videos, 12)
+    page = request.GET.get('page') 
+    try:
+        videos = paginator.page(page)
+    except PageNotAnInteger:
+        videos = paginator.page(1)
+    except EmptyPage:
+        videos = paginator.page(paginator.num_pages)
+    return render(request, 'videos/popular.html', {'videos': videos})
+
+
+#detail of videos
 def video_detail(request, video_id):
     video = get_object_or_404(Video, id=video_id)
-    comments = video.comments.all()  
-    
+    comments = video.comments.all()    
     if request.method == 'POST' and request.user.is_authenticated:
         form = CommentForm(request.POST)
         if form.is_valid():
@@ -61,29 +107,23 @@ def video_detail(request, video_id):
 @login_required
 def like_video(request, video_id):
     video = get_object_or_404(Video, id=video_id)
-    user = request.user
-    
+    user = request.user   
     if video.user_has_disliked(user):
-        video.dislikes.remove(user)
-    
+        video.dislikes.remove(user)   
     if video.user_has_liked(user):
         video.likes.remove(user)
     else:
-        video.likes.add(user)
-    
+        video.likes.add(user)  
     return redirect('video_detail', video_id=video_id)
 #dislike
 @login_required
 def dislike_video(request, video_id):
     video = get_object_or_404(Video, id=video_id)
-    user = request.user
-    
+    user = request.user   
     if video.user_has_liked(user):
-        video.likes.remove(user)
-    
+        video.likes.remove(user)  
     if video.user_has_disliked(user):
         video.dislikes.remove(user)
     else:
-        video.dislikes.add(user)
-    
+        video.dislikes.add(user)   
     return redirect('video_detail', video_id=video_id)
