@@ -12,23 +12,30 @@
     <p>Subido por: {{ video.user.username }}</p>
 <!-- parte de like y dislike -->
     <div class="rating-buttons">
-        <form action="{% url 'like_video' video.id %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn-like ">
-                👍 {{ video.total_likes }}
-            </button>
-        </form>
+        <div class="row">
+            <div class="col-1">
+            <form action="{% url 'like_video' video.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn-like ">
+                    👍 {{ video.total_likes }}
+                </button>
+            </form></div>
+            <div class="col-1">
+                <form action="{% url 'dislike_video' video.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-dislike ">
+                        👎 {{ video.total_dislikes }}
+                    </button>
+                </form>
+            </div>
+        </div>
         
-        <form action="{% url 'dislike_video' video.id %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn-dislike ">
-                👎 {{ video.total_dislikes }}
-            </button>
-        </form>
+        
+       
     </div>
     <!-- end parte de like y dislike -->
 
-    
+
     <!-- part coments -->
     <div class="Container mt-5">
         <h3>Comentarios ({{ comments.count }})</h3>  
@@ -37,7 +44,7 @@
             {% if user.is_authenticated %}
             <form method="post">
                 {% csrf_token %}
-                {{ form }}
+                {{ form.content }}
                 <br>
                 <button type="submit" class="btn btn-primary">Publicar Comentario</button>
             </form>

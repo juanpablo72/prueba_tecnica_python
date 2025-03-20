@@ -15,7 +15,7 @@
         <!-- Menú de usuario -->
         <div class="navbar-nav">
           {% if user.is_authenticated %}
-          <a class="btn btn-warining" href="{% url 'view_history' %}">Subir Video</a>
+          <a class="btn btn-warning" href="{% url 'view_history' %}">Subir Video</a>
           <a class="btn btn-primary" href="{% url 'upload_video' %}">Subir Video</a>
          <a class="btn btn-danger" href="{% url 'popular_videos' %}">videos populares</a>
           <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
